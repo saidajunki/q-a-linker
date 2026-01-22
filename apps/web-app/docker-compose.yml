@@ -1,6 +1,7 @@
 services:
   app:
     build: .
+    image: q-a-linker-app:latest
     container_name: q-a-linker
     restart: unless-stopped
     networks:

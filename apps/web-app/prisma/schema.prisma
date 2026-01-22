@@ -1,0 +1,272 @@
+// QALinker Database Schema
+// Based on docs/specs/data-model.md
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================
+// Enums
+// ============================================
+
+enum UserRole {
+  asker
+  responder
+  admin
+}
+
+enum ThreadStatus {
+  open
+  answering
+  answered
+  closed
+}
+
+enum MessageType {
+  question
+  answer
+  system
+  merged_answer
+}
+
+enum AIArtifactKind {
+  question_structured
+  answer_simplified
+  merged_answer
+  moderation
+}
+
+enum AssignmentStatus {
+  notified
+  viewed
+  answering
+  answered
+  declined
+}
+
+enum NotificationType {
+  new_question
+  new_answer
+  merged_answer
+  thanks
+}
+
+enum FeedbackKind {
+  thanks
+  helpful
+}
+
+enum ReportReason {
+  spam
+  harassment
+  inappropriate
+  other
+}
+
+enum ReportStatus {
+  pending
+  reviewed
+  resolved
+  dismissed
+}
+
+enum Level {
+  beginner
+  intermediate
+  advanced
+}
+
+// ============================================
+// Models
+// ============================================
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String
+  name         String
+  role         UserRole
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relations
+  responderProfile  ResponderProfile?
+  threads           Thread[]           @relation("ThreadAsker")
+  messages          Message[]
+  assignments       ThreadAssignment[] @relation("AssignmentResponder")
+  notifications     Notification[]
+  feedbackGiven     Feedback[]         @relation("FeedbackFrom")
+  feedbackReceived  Feedback[]         @relation("FeedbackTo")
+  reports           Report[]
+  refreshTokens     RefreshToken[]
+
+  @@map("users")
+}
+
+model ResponderProfile {
+  id              String  @id @default(uuid())
+  userId          String  @unique
+  expertiseTags   String[]
+  levelPreference Level?
+  answerCount     Int     @default(0)
+  thanksCount     Int     @default(0)
+  avgResponseTime Int?    // in minutes
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("responder_profiles")
+}
+
+model Thread {
+  id             String       @id @default(uuid())
+  askerId        String
+  title          String?
+  status         ThreadStatus @default(open)
+  category       String?
+  estimatedLevel Level?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  // Relations
+  asker         User               @relation("ThreadAsker", fields: [askerId], references: [id], onDelete: Cascade)
+  messages      Message[]
+  aiArtifacts   AIArtifact[]
+  assignments   ThreadAssignment[]
+  notifications Notification[]
+  feedbacks     Feedback[]
+  reports       Report[]
+
+  @@map("threads")
+}
+
+model Message {
+  id                String      @id @default(uuid())
+  threadId          String
+  senderId          String
+  type              MessageType
+  body              String
+  isOriginal        Boolean     @default(true)
+  originalMessageId String?
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+
+  // Relations
+  thread          Thread     @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  sender          User       @relation(fields: [senderId], references: [id], onDelete: Cascade)
+  originalMessage Message?   @relation("MessageTranslation", fields: [originalMessageId], references: [id])
+  translations    Message[]  @relation("MessageTranslation")
+  feedbacks       Feedback[]
+  reports         Report[]
+
+  @@map("messages")
+}
+
+model AIArtifact {
+  id              String         @id @default(uuid())
+  threadId        String
+  kind            AIArtifactKind
+  inputMessageIds String[]
+  outputJson      Json
+  outputText      String?
+  model           String
+  createdAt       DateTime       @default(now())
+
+  // Relations
+  thread Thread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+
+  @@map("ai_artifacts")
+}
+
+model ThreadAssignment {
+  id          String           @id @default(uuid())
+  threadId    String
+  responderId String
+  status      AssignmentStatus @default(notified)
+  notifiedAt  DateTime         @default(now())
+  viewedAt    DateTime?
+  answeredAt  DateTime?
+
+  // Relations
+  thread    Thread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  responder User   @relation("AssignmentResponder", fields: [responderId], references: [id], onDelete: Cascade)
+
+  @@unique([threadId, responderId])
+  @@map("thread_assignments")
+}
+
+model Notification {
+  id        String           @id @default(uuid())
+  userId    String
+  threadId  String?
+  type      NotificationType
+  title     String
+  body      String
+  isRead    Boolean          @default(false)
+  createdAt DateTime         @default(now())
+
+  // Relations
+  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  thread Thread? @relation(fields: [threadId], references: [id], onDelete: Cascade)
+
+  @@map("notifications")
+}
+
+model Feedback {
+  id         String       @id @default(uuid())
+  threadId   String
+  messageId  String
+  fromUserId String
+  toUserId   String
+  kind       FeedbackKind
+  createdAt  DateTime     @default(now())
+
+  // Relations
+  thread  Thread  @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  message Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  from    User    @relation("FeedbackFrom", fields: [fromUserId], references: [id], onDelete: Cascade)
+  to      User    @relation("FeedbackTo", fields: [toUserId], references: [id], onDelete: Cascade)
+
+  @@unique([threadId, messageId, fromUserId])
+  @@map("feedbacks")
+}
+
+model Report {
+  id          String       @id @default(uuid())
+  threadId    String
+  messageId   String?
+  reporterId  String
+  reason      ReportReason
+  description String?
+  status      ReportStatus @default(pending)
+  createdAt   DateTime     @default(now())
+  resolvedAt  DateTime?
+
+  // Relations
+  thread   Thread   @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  message  Message? @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  reporter User     @relation(fields: [reporterId], references: [id], onDelete: Cascade)
+
+  @@map("reports")
+}
+
+model RefreshToken {
+  id        String    @id @default(uuid())
+  userId    String
+  token     String    @unique
+  expiresAt DateTime
+  createdAt DateTime  @default(now())
+  revokedAt DateTime?
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("refresh_tokens")
+}

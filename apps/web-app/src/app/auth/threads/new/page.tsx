@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import AuthLayout from '@/components/AuthLayout';
 import { threadApi } from '@/lib/api/client';
 
 interface AIAnalysis {
@@ -37,7 +38,6 @@ export default function NewThreadPage() {
       setError(result.message ?? 'エラーが発生しました');
       setLoading(false);
     } else if (result.data) {
-      // AI分析結果を表示
       const aiOutput = result.data.aiArtifact.outputJson as AIAnalysis;
       setAnalysis(aiOutput);
       setThreadId(result.data.thread.id);
@@ -53,7 +53,6 @@ export default function NewThreadPage() {
   };
 
   const handleAddInfo = () => {
-    // 不足情報を追加するためにスレッドページへ
     if (threadId) {
       router.push(`/auth/threads/${threadId}?addInfo=true`);
     }
@@ -61,38 +60,41 @@ export default function NewThreadPage() {
 
   if (showConfirm && analysis) {
     return (
-      <div className="min-h-screen bg-gray-50">
-        <div className="max-w-2xl mx-auto px-4 py-8">
-          <div className="bg-white rounded-lg shadow p-6">
-            <h1 className="text-2xl font-bold text-gray-900 mb-6">
-              質問を投稿しました！
-            </h1>
+      <AuthLayout>
+        <div className="max-w-2xl mx-auto">
+          <div className="card">
+            <h1 className="text-2xl font-bold mb-6">質問を投稿しました！</h1>
 
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-              <h2 className="font-medium text-blue-900 mb-2">AIによる分析結果</h2>
-              <div className="space-y-2 text-sm text-blue-800">
+            <div className="bg-[var(--color-highlight)]/20 border border-[var(--color-highlight)]/50 rounded-lg p-4 mb-6">
+              <h2 className="font-medium text-[var(--color-highlight)] mb-2">
+                AIによる分析結果
+              </h2>
+              <div className="space-y-2 text-sm text-gray-300">
                 <p>
-                  <span className="font-medium">カテゴリ:</span>{' '}
+                  <span className="text-gray-400">カテゴリ:</span>{' '}
                   {analysis.categories.join(', ')}
                 </p>
                 <p>
-                  <span className="font-medium">推定レベル:</span>{' '}
-                  {analysis.estimatedLevel === 'beginner' ? '初心者' : 
-                   analysis.estimatedLevel === 'intermediate' ? '中級者' : '上級者'}
+                  <span className="text-gray-400">推定レベル:</span>{' '}
+                  {analysis.estimatedLevel === 'beginner'
+                    ? '初心者'
+                    : analysis.estimatedLevel === 'intermediate'
+                      ? '中級者'
+                      : '上級者'}
                 </p>
                 <p>
-                  <span className="font-medium">質問の意図:</span>{' '}
+                  <span className="text-gray-400">質問の意図:</span>{' '}
                   {analysis.intent}
                 </p>
               </div>
             </div>
 
             {analysis.missingInfo.length > 0 && (
-              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
-                <h2 className="font-medium text-yellow-900 mb-2">
+              <div className="bg-yellow-500/20 border border-yellow-500/50 rounded-lg p-4 mb-6">
+                <h2 className="font-medium text-yellow-400 mb-2">
                   💡 追加情報があるとより良い回答が得られます
                 </h2>
-                <ul className="list-disc list-inside text-sm text-yellow-800 space-y-1">
+                <ul className="list-disc list-inside text-sm text-yellow-300 space-y-1">
                   {analysis.missingInfo.map((info, i) => (
                     <li key={i}>{info}</li>
                   ))}
@@ -100,50 +102,44 @@ export default function NewThreadPage() {
               </div>
             )}
 
-            <p className="text-gray-600 mb-6">
+            <p className="text-gray-400 mb-6">
               回答者に通知が送信されました。回答が届くまでしばらくお待ちください。
             </p>
 
             <div className="flex gap-4">
-              <button
-                onClick={handleContinue}
-                className="flex-1 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition"
-              >
+              <button onClick={handleContinue} className="flex-1 btn-primary">
                 質問を確認する
               </button>
               {analysis.missingInfo.length > 0 && (
-                <button
-                  onClick={handleAddInfo}
-                  className="flex-1 bg-yellow-500 text-white py-3 rounded-lg hover:bg-yellow-600 transition"
-                >
+                <button onClick={handleAddInfo} className="flex-1 btn-secondary">
                   追加情報を入力する
                 </button>
               )}
             </div>
           </div>
         </div>
-      </div>
+      </AuthLayout>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-2xl mx-auto px-4 py-8">
+    <AuthLayout>
+      <div className="max-w-2xl mx-auto">
         <div className="mb-8">
           <Link
             href="/auth/threads"
-            className="text-blue-600 hover:underline text-sm"
+            className="text-[var(--color-highlight)] hover:underline text-sm"
           >
             ← 質問一覧に戻る
           </Link>
         </div>
 
-        <div className="bg-white rounded-lg shadow p-6">
-          <h1 className="text-2xl font-bold text-gray-900 mb-6">質問する</h1>
+        <div className="card">
+          <h1 className="text-2xl font-bold mb-6">質問する</h1>
 
           <form onSubmit={handleSubmit}>
             {error && (
-              <div className="bg-red-50 text-red-600 p-4 rounded-lg mb-4">
+              <div className="p-3 bg-red-500/20 border border-red-500/50 rounded-lg text-red-400 text-sm mb-4">
                 {error}
               </div>
             )}
@@ -151,7 +147,7 @@ export default function NewThreadPage() {
             <div className="mb-6">
               <label
                 htmlFor="body"
-                className="block text-sm font-medium text-gray-700 mb-2"
+                className="block text-sm text-gray-400 mb-2"
               >
                 質問内容
               </label>
@@ -160,7 +156,7 @@ export default function NewThreadPage() {
                 value={body}
                 onChange={(e) => setBody(e.target.value)}
                 rows={8}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-gray-500 focus:outline-none focus:border-[var(--color-highlight)] transition-colors resize-none"
                 placeholder="わからないこと、困っていることを自由に書いてください。専門用語がわからなくても大丈夫です。"
               />
               <p className="mt-2 text-sm text-gray-500">
@@ -171,13 +167,13 @@ export default function NewThreadPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? '送信中...' : '質問を投稿する'}
             </button>
           </form>
         </div>
       </div>
-    </div>
+    </AuthLayout>
   );
 }

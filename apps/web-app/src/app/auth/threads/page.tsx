@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import AuthLayout from '@/components/AuthLayout';
 import { threadApi } from '@/lib/api/client';
 
 interface Thread {
@@ -22,10 +23,10 @@ const statusLabels: Record<string, string> = {
 };
 
 const statusColors: Record<string, string> = {
-  open: 'bg-yellow-100 text-yellow-800',
-  answering: 'bg-blue-100 text-blue-800',
-  answered: 'bg-green-100 text-green-800',
-  closed: 'bg-gray-100 text-gray-800',
+  open: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/50',
+  answering: 'bg-blue-500/20 text-blue-400 border-blue-500/50',
+  answered: 'bg-green-500/20 text-green-400 border-green-500/50',
+  closed: 'bg-gray-500/20 text-gray-400 border-gray-500/50',
 };
 
 export default function ThreadsPage() {
@@ -50,35 +51,36 @@ export default function ThreadsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-gray-500">読み込み中...</div>
-      </div>
+      <AuthLayout>
+        <div className="flex items-center justify-center py-12">
+          <div className="text-gray-400">読み込み中...</div>
+        </div>
+      </AuthLayout>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-4xl mx-auto px-4 py-8">
+    <AuthLayout>
+      <div className="max-w-4xl mx-auto">
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-2xl font-bold text-gray-900">質問一覧</h1>
-          <Link
-            href="/auth/threads/new"
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
-          >
+          <h1 className="text-3xl font-bold">質問一覧</h1>
+          <Link href="/auth/threads/new" className="btn-primary">
             質問する
           </Link>
         </div>
 
         {error && (
-          <div className="bg-red-50 text-red-600 p-4 rounded-lg mb-6">{error}</div>
+          <div className="p-3 bg-red-500/20 border border-red-500/50 rounded-lg text-red-400 text-sm mb-6">
+            {error}
+          </div>
         )}
 
         {threads.length === 0 ? (
-          <div className="bg-white rounded-lg shadow p-8 text-center">
-            <p className="text-gray-500 mb-4">まだ質問がありません</p>
+          <div className="card text-center py-12">
+            <p className="text-gray-400 mb-4">まだ質問がありません</p>
             <Link
               href="/auth/threads/new"
-              className="text-blue-600 hover:underline"
+              className="text-[var(--color-highlight)] hover:underline"
             >
               最初の質問を投稿する
             </Link>
@@ -89,14 +91,14 @@ export default function ThreadsPage() {
               <Link
                 key={thread.id}
                 href={`/auth/threads/${thread.id}`}
-                className="block bg-white rounded-lg shadow p-6 hover:shadow-md transition"
+                className="block card hover:border-white/30 transition-colors"
               >
                 <div className="flex justify-between items-start mb-2">
-                  <h2 className="text-lg font-medium text-gray-900">
+                  <h2 className="text-lg font-medium">
                     {thread.title ?? '無題'}
                   </h2>
                   <span
-                    className={`px-2 py-1 rounded text-sm ${statusColors[thread.status] ?? 'bg-gray-100'}`}
+                    className={`px-2 py-1 rounded text-sm border ${statusColors[thread.status] ?? 'bg-gray-500/20 text-gray-400'}`}
                   >
                     {statusLabels[thread.status] ?? thread.status}
                   </span>
@@ -113,6 +115,6 @@ export default function ThreadsPage() {
           </div>
         )}
       </div>
-    </div>
+    </AuthLayout>
   );
 }

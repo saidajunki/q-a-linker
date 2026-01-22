@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import AuthLayout from '@/components/AuthLayout';
 
 interface Notification {
   id: string;
@@ -75,32 +76,26 @@ export default function NotificationsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-gray-500">読み込み中...</div>
+      <div className="min-h-screen flex items-center justify-center bg-[var(--color-primary)]">
+        <div className="text-gray-400">読み込み中...</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-2xl mx-auto px-4 py-8">
-        <div className="mb-6">
-          <Link href="/auth/dashboard" className="text-blue-600 hover:underline text-sm">
-            ← ダッシュボードに戻る
-          </Link>
-        </div>
-
+    <AuthLayout>
+      <div className="max-w-2xl mx-auto">
         <div className="flex justify-between items-center mb-8">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">通知</h1>
+            <h1 className="text-2xl font-bold text-white">通知</h1>
             {unreadCount > 0 && (
-              <p className="text-sm text-gray-500">{unreadCount}件の未読</p>
+              <p className="text-sm text-gray-400">{unreadCount}件の未読</p>
             )}
           </div>
           {unreadCount > 0 && (
             <button
               onClick={markAllAsRead}
-              className="text-sm text-blue-600 hover:underline"
+              className="text-sm text-[var(--color-accent)] hover:opacity-80 transition"
             >
               すべて既読にする
             </button>
@@ -108,20 +103,20 @@ export default function NotificationsPage() {
         </div>
 
         {error && (
-          <div className="bg-red-50 text-red-600 p-4 rounded-lg mb-6">{error}</div>
+          <div className="bg-red-500/20 text-red-300 p-4 rounded-lg mb-6">{error}</div>
         )}
 
         {notifications.length === 0 ? (
-          <div className="bg-white rounded-lg shadow p-8 text-center">
-            <p className="text-gray-500">通知はありません</p>
+          <div className="bg-white/5 rounded-lg p-8 text-center">
+            <p className="text-gray-400">通知はありません</p>
           </div>
         ) : (
           <div className="space-y-3">
             {notifications.map((notification) => (
               <div
                 key={notification.id}
-                className={`bg-white rounded-lg shadow p-4 ${
-                  !notification.isRead ? 'border-l-4 border-blue-500' : ''
+                className={`bg-white/5 rounded-lg p-4 border border-white/10 ${
+                  !notification.isRead ? 'border-l-4 border-l-[var(--color-accent)]' : ''
                 }`}
               >
                 <div className="flex items-start gap-3">
@@ -130,19 +125,19 @@ export default function NotificationsPage() {
                   </span>
                   <div className="flex-1">
                     <div className="flex justify-between items-start">
-                      <h3 className="font-medium text-gray-900">
+                      <h3 className="font-medium text-white">
                         {notification.title}
                       </h3>
-                      <span className="text-xs text-gray-400">
+                      <span className="text-xs text-gray-500">
                         {new Date(notification.createdAt).toLocaleDateString('ja-JP')}
                       </span>
                     </div>
-                    <p className="text-sm text-gray-600 mt-1">{notification.body}</p>
+                    <p className="text-sm text-gray-400 mt-1">{notification.body}</p>
                     <div className="flex gap-3 mt-2">
                       {notification.threadId && (
                         <Link
                           href={`/auth/threads/${notification.threadId}`}
-                          className="text-sm text-blue-600 hover:underline"
+                          className="text-sm text-[var(--color-accent)] hover:opacity-80 transition"
                         >
                           スレッドを見る
                         </Link>
@@ -150,7 +145,7 @@ export default function NotificationsPage() {
                       {!notification.isRead && (
                         <button
                           onClick={() => markAsRead(notification.id)}
-                          className="text-sm text-gray-500 hover:text-gray-700"
+                          className="text-sm text-gray-400 hover:text-white transition"
                         >
                           既読にする
                         </button>
@@ -163,6 +158,6 @@ export default function NotificationsPage() {
           </div>
         )}
       </div>
-    </div>
+    </AuthLayout>
   );
 }

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Link from 'next/link';
+import AuthLayout from '@/components/AuthLayout';
 
 interface User {
   id: string;
@@ -51,7 +51,6 @@ export default function SettingsPage() {
     }
 
     try {
-      // ユーザー情報取得
       const userRes = await fetch('/api/users/me', {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -61,7 +60,6 @@ export default function SettingsPage() {
         setName(userData.user.name);
       }
 
-      // 回答者プロフィール取得
       const profileRes = await fetch('/api/users/me/responder-profile', {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -88,7 +86,6 @@ export default function SettingsPage() {
     const token = localStorage.getItem('accessToken');
 
     try {
-      // ユーザー名更新
       const userRes = await fetch('/api/users/me', {
         method: 'PATCH',
         headers: {
@@ -102,7 +99,6 @@ export default function SettingsPage() {
         throw new Error('プロフィールの更新に失敗しました');
       }
 
-      // 回答者プロフィール更新
       const profileRes = await fetch('/api/users/me/responder-profile', {
         method: 'PATCH',
         headers: {
@@ -141,81 +137,75 @@ export default function SettingsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-gray-500">読み込み中...</div>
+      <div className="min-h-screen flex items-center justify-center bg-[var(--color-primary)]">
+        <div className="text-gray-400">読み込み中...</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-2xl mx-auto px-4 py-8">
-        <div className="mb-6">
-          <Link href="/auth/dashboard" className="text-blue-600 hover:underline text-sm">
-            ← ダッシュボードに戻る
-          </Link>
-        </div>
-
-        <h1 className="text-2xl font-bold text-gray-900 mb-8">設定</h1>
+    <AuthLayout>
+      <div className="max-w-2xl mx-auto">
+        <h1 className="text-2xl font-bold text-white mb-8">設定</h1>
 
         {error && (
-          <div className="bg-red-50 text-red-600 p-4 rounded-lg mb-6">{error}</div>
+          <div className="bg-red-500/20 text-red-300 p-4 rounded-lg mb-6">{error}</div>
         )}
         {success && (
-          <div className="bg-green-50 text-green-600 p-4 rounded-lg mb-6">{success}</div>
+          <div className="bg-green-500/20 text-green-300 p-4 rounded-lg mb-6">{success}</div>
         )}
 
         {/* 基本情報 */}
-        <div className="bg-white rounded-lg shadow p-6 mb-6">
-          <h2 className="text-lg font-medium text-gray-900 mb-4">基本情報</h2>
+        <div className="bg-white/5 rounded-lg p-6 mb-6 border border-white/10">
+          <h2 className="text-lg font-medium text-white mb-4">基本情報</h2>
           
           <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-300 mb-2">
               メールアドレス
             </label>
             <input
               type="email"
               value={user?.email ?? ''}
               disabled
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100 text-gray-500"
+              className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-gray-400"
             />
           </div>
 
           <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-300 mb-2">
               名前
             </label>
             <input
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:ring-2 focus:ring-[var(--color-accent)] focus:border-transparent"
             />
           </div>
         </div>
 
         {/* 回答者設定 */}
-        <div className="bg-white rounded-lg shadow p-6 mb-6">
-          <h2 className="text-lg font-medium text-gray-900 mb-4">回答者設定</h2>
-          <p className="text-sm text-gray-500 mb-4">
+        <div className="bg-white/5 rounded-lg p-6 mb-6 border border-white/10">
+          <h2 className="text-lg font-medium text-white mb-4">回答者設定</h2>
+          <p className="text-sm text-gray-400 mb-4">
             得意分野を設定すると、関連する質問が届くようになります
           </p>
 
           {/* 得意分野タグ */}
           <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-300 mb-2">
               得意分野（最大10個）
             </label>
             <div className="flex flex-wrap gap-2 mb-3">
               {expertiseTags.map((tag) => (
                 <span
                   key={tag}
-                  className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm flex items-center gap-1"
+                  className="bg-[var(--color-accent)]/20 text-[var(--color-accent)] px-3 py-1 rounded-full text-sm flex items-center gap-1"
                 >
                   {tag}
                   <button
                     onClick={() => removeTag(tag)}
-                    className="text-blue-600 hover:text-blue-800"
+                    className="hover:opacity-70"
                   >
                     ×
                   </button>
@@ -229,12 +219,12 @@ export default function SettingsPage() {
                 onChange={(e) => setNewTag(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && addTag(newTag)}
                 placeholder="タグを入力..."
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="flex-1 px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-500 focus:ring-2 focus:ring-[var(--color-accent)] focus:border-transparent"
               />
               <button
                 onClick={() => addTag(newTag)}
                 disabled={!newTag || expertiseTags.length >= 10}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+                className="px-4 py-2 bg-[var(--color-accent)] text-white rounded-lg hover:opacity-90 disabled:opacity-50 transition"
               >
                 追加
               </button>
@@ -246,7 +236,7 @@ export default function SettingsPage() {
                   <button
                     key={tag}
                     onClick={() => addTag(tag)}
-                    className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded hover:bg-gray-200"
+                    className="text-xs bg-white/10 text-gray-400 px-2 py-1 rounded hover:bg-white/20 transition"
                   >
                     + {tag}
                   </button>
@@ -257,18 +247,18 @@ export default function SettingsPage() {
 
           {/* 得意なレベル */}
           <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-300 mb-2">
               得意な説明レベル
             </label>
             <select
               value={levelPreference}
               onChange={(e) => setLevelPreference(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:ring-2 focus:ring-[var(--color-accent)] focus:border-transparent"
             >
-              <option value="">指定なし</option>
-              <option value="beginner">初心者向け</option>
-              <option value="intermediate">中級者向け</option>
-              <option value="advanced">上級者向け</option>
+              <option value="" className="bg-[var(--color-primary)]">指定なし</option>
+              <option value="beginner" className="bg-[var(--color-primary)]">初心者向け</option>
+              <option value="intermediate" className="bg-[var(--color-primary)]">中級者向け</option>
+              <option value="advanced" className="bg-[var(--color-primary)]">上級者向け</option>
             </select>
             <p className="text-xs text-gray-500 mt-1">
               設定したレベルの質問が優先的に届きます
@@ -277,19 +267,19 @@ export default function SettingsPage() {
 
           {/* 統計情報 */}
           {profile && (
-            <div className="mt-6 pt-6 border-t border-gray-200">
-              <h3 className="text-sm font-medium text-gray-700 mb-3">あなたの実績</h3>
+            <div className="mt-6 pt-6 border-t border-white/10">
+              <h3 className="text-sm font-medium text-gray-300 mb-3">あなたの実績</h3>
               <div className="grid grid-cols-3 gap-4 text-center">
-                <div className="bg-gray-50 p-3 rounded-lg">
-                  <div className="text-2xl font-bold text-gray-900">{profile.answerCount}</div>
+                <div className="bg-white/5 p-3 rounded-lg">
+                  <div className="text-2xl font-bold text-white">{profile.answerCount}</div>
                   <div className="text-xs text-gray-500">回答数</div>
                 </div>
-                <div className="bg-gray-50 p-3 rounded-lg">
-                  <div className="text-2xl font-bold text-gray-900">{profile.thanksCount}</div>
+                <div className="bg-white/5 p-3 rounded-lg">
+                  <div className="text-2xl font-bold text-white">{profile.thanksCount}</div>
                   <div className="text-xs text-gray-500">ありがとう</div>
                 </div>
-                <div className="bg-gray-50 p-3 rounded-lg">
-                  <div className="text-2xl font-bold text-gray-900">
+                <div className="bg-white/5 p-3 rounded-lg">
+                  <div className="text-2xl font-bold text-white">
                     {profile.avgResponseTime ? `${profile.avgResponseTime}分` : '-'}
                   </div>
                   <div className="text-xs text-gray-500">平均応答時間</div>
@@ -302,11 +292,11 @@ export default function SettingsPage() {
         <button
           onClick={handleSaveProfile}
           disabled={saving}
-          className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition disabled:opacity-50"
+          className="w-full bg-[var(--color-accent)] text-white py-3 rounded-lg hover:opacity-90 transition disabled:opacity-50"
         >
           {saving ? '保存中...' : '設定を保存'}
         </button>
       </div>
-    </div>
+    </AuthLayout>
   );
 }

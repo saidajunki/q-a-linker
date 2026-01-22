@@ -6,16 +6,20 @@ import {
   VisionSection,
   CTASection,
 } from "@/components/sections";
+import { Header } from "@/components/Header";
 
 export default function Home() {
   return (
-    <main>
-      <HeroSection />
-      <ProblemSection />
-      <SolutionSection />
-      <ValueSection />
-      <VisionSection />
-      <CTASection />
-    </main>
+    <>
+      <Header />
+      <main>
+        <HeroSection />
+        <ProblemSection />
+        <SolutionSection />
+        <ValueSection />
+        <VisionSection />
+        <CTASection />
+      </main>
+    </>
   );
 }

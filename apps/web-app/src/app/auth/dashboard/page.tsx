@@ -85,6 +85,18 @@ export default function DashboardPage() {
             QALinker
           </Link>
           <div className="flex items-center gap-4">
+            <Link
+              href="/auth/notifications"
+              className="text-gray-400 hover:text-white transition-colors"
+            >
+              🔔 通知
+            </Link>
+            <Link
+              href="/auth/settings"
+              className="text-gray-400 hover:text-white transition-colors"
+            >
+              ⚙️ 設定
+            </Link>
             <span className="text-gray-400">{user?.name}</span>
             <button
               onClick={handleLogout}

@@ -19,5 +19,5 @@ jobs:
             cd /opt/apps/q-a-linker
             git pull origin main
             cd apps/web-app
-            docker compose -p q-a-linker down
+            docker rm -f q-a-linker 2>/dev/null || true
             docker compose -p q-a-linker up -d --build

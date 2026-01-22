@@ -20,5 +20,7 @@ jobs:
             git checkout -- .
             git pull origin main
             cd apps/web-app
-            docker rm -f q-a-linker 2>/dev/null || true
-            docker compose -p q-a-linker up -d --build
+            # Build new image first (while old container still running)
+            docker compose -p q-a-linker build
+            # Then replace container (minimal downtime)
+            docker compose -p q-a-linker up -d --force-recreate --no-build

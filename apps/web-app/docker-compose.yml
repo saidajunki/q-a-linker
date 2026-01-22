@@ -1,0 +1,17 @@
+services:
+  app:
+    build: .
+    container_name: q-a-linker
+    restart: unless-stopped
+    networks:
+      - apps-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.q-a-linker.rule=Host(`q-a-linker.app.babl.tech`)"
+      - "traefik.http.routers.q-a-linker.tls=true"
+      - "traefik.http.routers.q-a-linker.tls.certresolver=letsencrypt"
+      - "traefik.http.services.q-a-linker.loadbalancer.server.port=3000"
+
+networks:
+  apps-network:
+    external: true

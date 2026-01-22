@@ -124,12 +124,26 @@ export default function DashboardPage() {
                 ? "気軽に質問を投げてみましょう。専門用語がわからなくても大丈夫です。"
                 : "あなたの得意分野で誰かの役に立ちましょう。"}
             </p>
-            <button className="btn-primary">
+            <Link
+              href={user?.role === "asker" ? "/auth/threads/new" : "/auth/responder"}
+              className="btn-primary inline-block text-center"
+            >
               {user?.role === "asker" ? "質問を投稿する" : "質問を見る"}
-            </button>
-            <p className="text-xs text-gray-500 mt-4">
-              ※ この機能は現在開発中です
+            </Link>
+          </div>
+
+          {/* 履歴 */}
+          <div className="card">
+            <h2 className="text-xl font-bold mb-4">履歴</h2>
+            <p className="text-gray-400 mb-4">
+              過去の質問や回答を確認できます。
             </p>
+            <Link
+              href="/auth/threads"
+              className="btn-secondary inline-block text-center"
+            >
+              質問一覧を見る
+            </Link>
           </div>
         </div>
       </main>

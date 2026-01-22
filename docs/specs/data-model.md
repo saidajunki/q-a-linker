@@ -24,13 +24,15 @@ User → Thread → Message → AIArtifact
 | email | String | メールアドレス（ユニーク） |
 | passwordHash | String | パスワードハッシュ |
 | name | String | 表示名 |
-| role | Enum | asker / responder / admin |
+| role | Enum | user / admin |
 | createdAt | DateTime | 作成日時 |
 | updatedAt | DateTime | 更新日時 |
 
+**備考**: 全ユーザーは質問も回答も可能。roleは権限管理のみに使用。
+
 ### ResponderProfile（回答者プロフィール）
 
-回答者の追加情報を管理する。
+ユーザーの回答者としての追加情報を管理する。全ユーザーに自動作成される。
 
 | カラム | 型 | 説明 |
 |--------|------|------|
@@ -167,8 +169,7 @@ JWT認証のリフレッシュトークンを管理する。
 ## Enum定義
 
 ### UserRole
-- `asker` - 質問者
-- `responder` - 回答者
+- `user` - 一般ユーザー（質問・回答両方可能）
 - `admin` - 管理者
 
 ### ThreadStatus
@@ -229,7 +230,7 @@ JWT認証のリフレッシュトークンを管理する。
 
 ```
 User
-├── ResponderProfile (1:1, 回答者のみ)
+├── ResponderProfile (1:1, 全ユーザー)
 ├── Thread (1:N, 質問者として)
 ├── Message (1:N, 送信者として)
 ├── ThreadAssignment (1:N, 回答者として)

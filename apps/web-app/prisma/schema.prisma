@@ -15,8 +15,7 @@ datasource db {
 // ============================================
 
 enum UserRole {
-  asker
-  responder
+  user
   admin
 }
 

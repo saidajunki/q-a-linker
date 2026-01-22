@@ -9,7 +9,6 @@ export default function SignupPage() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState<"asker" | "responder">("asker");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -22,7 +21,7 @@ export default function SignupPage() {
       const res = await fetch("/api/auth/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, password, role }),
+        body: JSON.stringify({ name, email, password }),
       });
 
       const data = await res.json();
@@ -112,38 +111,11 @@ export default function SignupPage() {
             <p className="text-xs text-gray-500 mt-1">8文字以上、英字と数字を含めてください</p>
           </div>
 
-          <div>
-            <label className="block text-sm text-gray-400 mb-2">
-              利用目的
-            </label>
-            <div className="grid grid-cols-2 gap-4">
-              <button
-                type="button"
-                onClick={() => setRole("asker")}
-                className={`p-4 rounded-lg border transition-colors ${
-                  role === "asker"
-                    ? "border-[var(--color-highlight)] bg-[var(--color-highlight)]/20"
-                    : "border-white/20 bg-white/5 hover:bg-white/10"
-                }`}
-              >
-                <div className="text-2xl mb-2">❓</div>
-                <div className="font-medium">質問したい</div>
-                <div className="text-xs text-gray-400 mt-1">質問者として登録</div>
-              </button>
-              <button
-                type="button"
-                onClick={() => setRole("responder")}
-                className={`p-4 rounded-lg border transition-colors ${
-                  role === "responder"
-                    ? "border-[var(--color-highlight)] bg-[var(--color-highlight)]/20"
-                    : "border-white/20 bg-white/5 hover:bg-white/10"
-                }`}
-              >
-                <div className="text-2xl mb-2">💡</div>
-                <div className="font-medium">回答したい</div>
-                <div className="text-xs text-gray-400 mt-1">回答者として登録</div>
-              </button>
-            </div>
+          <div className="p-4 bg-white/5 rounded-lg border border-white/10">
+            <p className="text-sm text-gray-300">
+              💡 QALinkerでは、すべてのユーザーが質問も回答もできます。
+              得意分野は後から設定画面で追加できます。
+            </p>
           </div>
 
           <button

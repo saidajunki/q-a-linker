@@ -13,7 +13,6 @@ test.describe('認証API', () => {
         email,
         password: 'TestPassword123',
         name: 'APIテストユーザー',
-        role: 'asker',
       },
     });
 
@@ -21,6 +20,7 @@ test.describe('認証API', () => {
     const data = await response.json();
     expect(data.user).toBeDefined();
     expect(data.user.email).toBe(email);
+    expect(data.user.role).toBe('user');
     expect(data.accessToken).toBeDefined();
     expect(data.refreshToken).toBeDefined();
   });
@@ -34,7 +34,6 @@ test.describe('認証API', () => {
         email,
         password: 'TestPassword123',
         name: 'ユーザー1',
-        role: 'asker',
       },
     });
 
@@ -44,7 +43,6 @@ test.describe('認証API', () => {
         email,
         password: 'TestPassword123',
         name: 'ユーザー2',
-        role: 'asker',
       },
     });
 
@@ -57,7 +55,7 @@ test.describe('認証API', () => {
 
     // 先に登録
     const signupRes = await request.post(`${API_BASE}/auth/signup`, {
-      data: { email, password, name: 'ログインテスト', role: 'asker' },
+      data: { email, password, name: 'ログインテスト' },
     });
     expect(signupRes.status()).toBe(201);
 
@@ -76,7 +74,7 @@ test.describe('認証API', () => {
 
     // 登録してトークン取得
     const signupRes = await request.post(`${API_BASE}/auth/signup`, {
-      data: { email, password: 'TestPassword123', name: 'Meテスト', role: 'asker' },
+      data: { email, password: 'TestPassword123', name: 'Meテスト' },
     });
     const { accessToken } = await signupRes.json();
 
@@ -102,7 +100,7 @@ test.describe('スレッドAPI', () => {
   test.beforeAll(async ({ request }) => {
     const email = generateEmail();
     const signupRes = await request.post(`${API_BASE}/auth/signup`, {
-      data: { email, password: 'TestPassword123', name: 'スレッドテスト', role: 'asker' },
+      data: { email, password: 'TestPassword123', name: 'スレッドテスト' },
     });
     const data = await signupRes.json();
     accessToken = data.accessToken;
@@ -183,7 +181,7 @@ test.describe('評価API', () => {
   test('POST /api/feedback - 評価送信（自分のメッセージにはエラー）', async ({ request }) => {
     const email = generateEmail();
     const signupRes = await request.post(`${API_BASE}/auth/signup`, {
-      data: { email, password: 'TestPassword123', name: '評価テスト', role: 'asker' },
+      data: { email, password: 'TestPassword123', name: '評価テスト' },
     });
     const { accessToken } = await signupRes.json();
 
@@ -212,7 +210,7 @@ test.describe('通報API', () => {
   test('POST /api/reports - 通報送信', async ({ request }) => {
     const email = generateEmail();
     const signupRes = await request.post(`${API_BASE}/auth/signup`, {
-      data: { email, password: 'TestPassword123', name: '通報テスト', role: 'asker' },
+      data: { email, password: 'TestPassword123', name: '通報テスト' },
     });
     const { accessToken } = await signupRes.json();
 

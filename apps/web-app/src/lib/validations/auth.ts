@@ -11,9 +11,6 @@ export const signupSchema = z.object({
     .string()
     .min(1, '名前を入力してください')
     .max(50, '名前は50文字以内で入力してください'),
-  role: z.enum(['asker', 'responder'], {
-    message: 'roleはaskerまたはresponderを指定してください',
-  }),
 });
 
 export const loginSchema = z.object({

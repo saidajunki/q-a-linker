@@ -9,7 +9,6 @@ import {
   conflictResponse,
   serverErrorResponse,
 } from '@/lib/api/response';
-import { UserRole } from '@prisma/client';
 
 export async function POST(request: NextRequest) {
   try {
@@ -21,7 +20,7 @@ export async function POST(request: NextRequest) {
       return validationErrorResponse(result.error);
     }
 
-    const { email, password, name, role } = result.data;
+    const { email, password, name } = result.data;
 
     // メールアドレスの重複チェック
     const existingUser = await prisma.user.findUnique({
@@ -35,25 +34,23 @@ export async function POST(request: NextRequest) {
     // パスワードをハッシュ化
     const passwordHash = await hashPassword(password);
 
-    // ユーザーを作成
+    // ユーザーを作成（全員userロール）
     const user = await prisma.user.create({
       data: {
         email,
         passwordHash,
         name,
-        role: role as UserRole,
+        role: 'user',
       },
     });
 
-    // 回答者の場合はプロフィールも作成
-    if (role === 'responder') {
-      await prisma.responderProfile.create({
-        data: {
-          userId: user.id,
-          expertiseTags: [],
-        },
-      });
-    }
+    // 全ユーザーにResponderProfileを作成（質問も回答も可能にするため）
+    await prisma.responderProfile.create({
+      data: {
+        userId: user.id,
+        expertiseTags: [],
+      },
+    });
 
     // トークンを生成
     const accessToken = await generateAccessToken({

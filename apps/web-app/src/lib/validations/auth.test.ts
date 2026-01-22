@@ -8,7 +8,6 @@ describe('auth validations', () => {
         email: 'test@example.com',
         password: 'Password123',
         name: 'テストユーザー',
-        role: 'asker',
       };
 
       const result = signupSchema.safeParse(input);
@@ -21,7 +20,6 @@ describe('auth validations', () => {
         email: 'invalid-email',
         password: 'Password123',
         name: 'テストユーザー',
-        role: 'asker',
       };
 
       const result = signupSchema.safeParse(input);
@@ -34,7 +32,6 @@ describe('auth validations', () => {
         email: 'test@example.com',
         password: 'Pass1',
         name: 'テストユーザー',
-        role: 'asker',
       };
 
       const result = signupSchema.safeParse(input);
@@ -47,7 +44,6 @@ describe('auth validations', () => {
         email: 'test@example.com',
         password: 'PasswordOnly',
         name: 'テストユーザー',
-        role: 'asker',
       };
 
       const result = signupSchema.safeParse(input);
@@ -60,7 +56,6 @@ describe('auth validations', () => {
         email: 'test@example.com',
         password: '12345678',
         name: 'テストユーザー',
-        role: 'asker',
       };
 
       const result = signupSchema.safeParse(input);
@@ -73,7 +68,6 @@ describe('auth validations', () => {
         email: 'test@example.com',
         password: 'Password123',
         name: '',
-        role: 'asker',
       };
 
       const result = signupSchema.safeParse(input);
@@ -86,38 +80,11 @@ describe('auth validations', () => {
         email: 'test@example.com',
         password: 'Password123',
         name: 'a'.repeat(51),
-        role: 'asker',
       };
 
       const result = signupSchema.safeParse(input);
 
       expect(result.success).toBe(false);
-    });
-
-    it('無効なroleを拒否する', () => {
-      const input = {
-        email: 'test@example.com',
-        password: 'Password123',
-        name: 'テストユーザー',
-        role: 'admin',
-      };
-
-      const result = signupSchema.safeParse(input);
-
-      expect(result.success).toBe(false);
-    });
-
-    it('responderロールを受け入れる', () => {
-      const input = {
-        email: 'test@example.com',
-        password: 'Password123',
-        name: 'テストユーザー',
-        role: 'responder',
-      };
-
-      const result = signupSchema.safeParse(input);
-
-      expect(result.success).toBe(true);
     });
   });
 

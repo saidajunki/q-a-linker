@@ -18,8 +18,7 @@ POST /api/auth/signup
 {
   "email": "user@example.com",
   "password": "securePassword123",
-  "name": "表示名",
-  "role": "asker"  // asker or responder
+  "name": "表示名"
 }
 ```
 
@@ -30,7 +29,7 @@ POST /api/auth/signup
     "id": "uuid",
     "email": "user@example.com",
     "name": "表示名",
-    "role": "asker"
+    "role": "user"
   },
   "accessToken": "eyJhbG...",
   "refreshToken": "eyJhbG..."
@@ -41,7 +40,11 @@ POST /api/auth/signup
 - email: 有効なメールアドレス形式、ユニーク
 - password: 8文字以上、英数字混合
 - name: 1-50文字
-- role: asker または responder
+
+**備考**:
+- 全ユーザーは質問も回答も可能
+- 登録時に自動的に`ResponderProfile`が作成される
+- 得意タグは後から設定画面で追加可能
 
 ### 2. ログイン
 
@@ -64,7 +67,7 @@ POST /api/auth/login
     "id": "uuid",
     "email": "user@example.com",
     "name": "表示名",
-    "role": "asker"
+    "role": "user"
   },
   "accessToken": "eyJhbG...",
   "refreshToken": "eyJhbG..."
@@ -135,7 +138,7 @@ Authorization: Bearer <accessToken>
     "id": "uuid",
     "email": "user@example.com",
     "name": "表示名",
-    "role": "asker"
+    "role": "user"
   }
 }
 ```
@@ -153,7 +156,7 @@ Authorization: Bearer <accessToken>
   {
     "sub": "user-uuid",
     "email": "user@example.com",
-    "role": "asker",
+    "role": "user",
     "iat": 1234567890,
     "exp": 1234568790
   }

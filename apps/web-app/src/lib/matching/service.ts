@@ -1,6 +1,9 @@
 /**
  * 回答者マッチングサービス
  * 仕様書: docs/specs/api.md (マッチング要件)
+ * 
+ * 全ユーザーが質問も回答も可能な設計。
+ * マッチングは得意タグ（expertiseTags）の有無で判定。
  */
 
 import { prisma } from '@/lib/prisma';
@@ -15,6 +18,12 @@ const MAX_RESPONDERS = 5;
 export async function matchResponders(input: MatchingInput): Promise<MatchingResult> {
   const { threadId, categories, estimatedLevel } = input;
 
+  // スレッドの質問者を取得（自分自身を除外するため）
+  const thread = await prisma.thread.findUnique({
+    where: { id: threadId },
+    select: { askerId: true },
+  });
+
   // 回答者プロフィールを持つユーザーを取得
   const responderProfiles = await prisma.responderProfile.findMany({
     include: {
@@ -26,7 +35,8 @@ export async function matchResponders(input: MatchingInput): Promise<MatchingRes
 
   // スコアリング
   const candidates: ResponderCandidate[] = responderProfiles
-    .filter((profile) => profile.user.role === 'responder' || profile.user.role === 'admin')
+    // 質問者自身を除外
+    .filter((profile) => profile.userId !== thread?.askerId)
     .map((profile) => {
       let score = 0;
       const matchedTags: string[] = [];
@@ -78,10 +88,13 @@ export async function matchResponders(input: MatchingInput): Promise<MatchingRes
     .sort((a, b) => b.score - a.score)
     .slice(0, MAX_RESPONDERS);
 
-  // タグマッチがない場合は全回答者から上位を選択
+  // タグマッチがない場合は得意タグを持つユーザーから上位を選択
   if (candidates.length === 0) {
     const fallbackCandidates = responderProfiles
-      .filter((profile) => profile.user.role === 'responder' || profile.user.role === 'admin')
+      // 質問者自身を除外
+      .filter((profile) => profile.userId !== thread?.askerId)
+      // 得意タグを持つユーザーを優先
+      .filter((profile) => profile.expertiseTags.length > 0)
       .map((profile) => ({
         userId: profile.userId,
         score: profile.answerCount * 0.5 + profile.thanksCount * 1,

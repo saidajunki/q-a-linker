@@ -17,6 +17,7 @@ jobs:
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
             cd /opt/apps/q-a-linker
+            git checkout -- .
             git pull origin main
             cd apps/web-app
             docker rm -f q-a-linker 2>/dev/null || true

@@ -7,7 +7,13 @@ services:
     networks:
       - apps-network
     environment:
-      - DATABASE_URL=postgresql://admin:BableDB2026!Secure@postgres:5432/q_a_linker
+      - DATABASE_URL=${DATABASE_URL}
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_ACCESS_EXPIRES_IN=${JWT_ACCESS_EXPIRES_IN:-15m}
+      - JWT_REFRESH_EXPIRES_IN=${JWT_REFRESH_EXPIRES_IN:-7d}
+      - AI_PROVIDER=${AI_PROVIDER:-mock}
+      - GOOGLE_AI_API_KEY=${GOOGLE_AI_API_KEY}
+      - GOOGLE_AI_MODEL=${GOOGLE_AI_MODEL:-gemini-2.0-flash}
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.q-a-linker.rule=Host(`q-a-linker.app.babl.tech`)"

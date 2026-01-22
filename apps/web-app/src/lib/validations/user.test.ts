@@ -17,8 +17,8 @@ describe('updateProfileSchema', () => {
     expect(result.success).toBe(false);
   });
 
-  it('100文字を超える名前を拒否する', () => {
-    const result = updateProfileSchema.safeParse({ name: 'a'.repeat(101) });
+  it('50文字を超える名前を拒否する', () => {
+    const result = updateProfileSchema.safeParse({ name: 'a'.repeat(51) });
     expect(result.success).toBe(false);
   });
 });

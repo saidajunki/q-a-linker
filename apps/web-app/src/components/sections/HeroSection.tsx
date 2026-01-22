@@ -5,6 +5,30 @@ import { motion } from "framer-motion";
 export function HeroSection() {
   return (
     <section className="section gradient-bg relative">
+      {/* ホームに戻るボタン */}
+      <motion.a
+        href="https://app.babl.tech"
+        className="absolute top-6 left-6 z-20 flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full text-white/80 hover:text-white hover:bg-white/20 transition-all duration-300"
+        initial={{ opacity: 0, x: -20 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.6 }}
+      >
+        <svg
+          className="w-4 h-4"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M10 19l-7-7m0 0l7-7m-7 7h18"
+          />
+        </svg>
+        <span className="text-sm font-medium">BableApp</span>
+      </motion.a>
+
       {/* 背景のパーティクル効果 */}
       <div className="absolute inset-0 overflow-hidden">
         {[...Array(20)].map((_, i) => (

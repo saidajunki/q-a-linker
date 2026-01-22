@@ -8,6 +8,7 @@ import { prisma } from '@/lib/prisma';
 import { verifyAccessToken } from '@/lib/auth/jwt';
 import { createMessageSchema } from '@/lib/validations/thread';
 import { getAIService } from '@/lib/ai';
+import { updateResponderStats } from '@/lib/matching';
 import {
   successResponse,
   unauthorizedResponse,
@@ -155,6 +156,11 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     if (answerCount >= 2) {
       // 非同期で統合回答を生成（バックグラウンド処理）
       generateMergedAnswer(threadId).catch(console.error);
+    }
+
+    // 回答者の統計を更新（非同期）
+    if (messageType === 'answer') {
+      updateResponderStats(payload.sub).catch(console.error);
     }
 
     return successResponse(

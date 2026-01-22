@@ -8,6 +8,7 @@ import { prisma } from '@/lib/prisma';
 import { verifyAccessToken } from '@/lib/auth/jwt';
 import { createThreadSchema, threadQuerySchema } from '@/lib/validations/thread';
 import { getAIService } from '@/lib/ai';
+import { matchResponders } from '@/lib/matching';
 import {
   successResponse,
   unauthorizedResponse,
@@ -86,6 +87,13 @@ export async function POST(request: NextRequest) {
 
       return { thread, message, aiArtifact };
     });
+
+    // 回答者マッチング（非同期で実行）
+    matchResponders({
+      threadId: result.thread.id,
+      categories: structured.categories,
+      estimatedLevel: structured.estimatedLevel,
+    }).catch((err) => console.error('Matching error:', err));
 
     return successResponse(
       {

@@ -6,6 +6,8 @@ services:
     restart: unless-stopped
     networks:
       - apps-network
+    environment:
+      - DATABASE_URL=postgresql://admin:BableDB2026!Secure@postgres:5432/qalinker
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.q-a-linker.rule=Host(`q-a-linker.app.babl.tech`)"

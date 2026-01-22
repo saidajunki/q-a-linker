@@ -1,0 +1,78 @@
+# 依存関係
+node_modules/
+
+# ビルド成果物
+dist/
+build/
+.next/
+out/
+*.tsbuildinfo
+
+# 環境変数・シークレット
+.env
+.env.local
+.env.*.local
+.env.development
+.env.production
+*.pem
+
+# ログ
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# OS生成ファイル
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# IDE・エディタ
+.idea/
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+
+# キャッシュ
+.cache/
+.turbo/
+.eslintcache
+.stylelintcache
+*.cache
+
+# テスト
+coverage/
+.nyc_output/
+
+# 一時ファイル
+*.tmp
+*.temp
+tmp/
+temp/
+
+# AWS CDK
+cdk.out/
+cdk.context.json
+
+# Prisma
+prisma/*.db
+prisma/*.db-journal
+
+# Vercel
+.vercel/
+
+# TypeScript
+*.tsbuildinfo
+
+# パッケージマネージャ
+.pnpm-store/

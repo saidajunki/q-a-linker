@@ -1,12 +1,16 @@
 import { SignJWT, jwtVerify } from 'jose';
 import { UserRole } from '@prisma/client';
 
-const JWT_SECRET = new TextEncoder().encode(
-  process.env.JWT_SECRET || 'default-secret-key-change-in-production'
-);
-
 const ACCESS_TOKEN_EXPIRES_IN = process.env.JWT_ACCESS_EXPIRES_IN || '15m';
 const REFRESH_TOKEN_EXPIRES_IN = process.env.JWT_REFRESH_EXPIRES_IN || '7d';
+
+/**
+ * JWT シークレットキーを取得する
+ */
+function getJWTSecret(): Uint8Array {
+  const secret = process.env.JWT_SECRET || 'default-secret-key-change-in-production';
+  return new TextEncoder().encode(secret);
+}
 
 export interface JWTPayload {
   sub: string;
@@ -26,7 +30,7 @@ export async function generateAccessToken(payload: Omit<JWTPayload, 'iat' | 'exp
     .setProtectedHeader({ alg: 'HS256' })
     .setIssuedAt()
     .setExpirationTime(expiresIn)
-    .sign(JWT_SECRET);
+    .sign(getJWTSecret());
 }
 
 /**
@@ -40,7 +44,7 @@ export async function generateRefreshToken(userId: string): Promise<{ token: str
     .setProtectedHeader({ alg: 'HS256' })
     .setIssuedAt()
     .setExpirationTime(expiresIn)
-    .sign(JWT_SECRET);
+    .sign(getJWTSecret());
   
   return { token, expiresAt };
 }
@@ -50,7 +54,7 @@ export async function generateRefreshToken(userId: string): Promise<{ token: str
  */
 export async function verifyAccessToken(token: string): Promise<JWTPayload | null> {
   try {
-    const { payload } = await jwtVerify(token, JWT_SECRET);
+    const { payload } = await jwtVerify(token, getJWTSecret());
     return payload as unknown as JWTPayload;
   } catch {
     return null;
@@ -62,7 +66,7 @@ export async function verifyAccessToken(token: string): Promise<JWTPayload | nul
  */
 export async function verifyRefreshToken(token: string): Promise<{ sub: string } | null> {
   try {
-    const { payload } = await jwtVerify(token, JWT_SECRET);
+    const { payload } = await jwtVerify(token, getJWTSecret());
     if (payload.type !== 'refresh') return null;
     return { sub: payload.sub as string };
   } catch {

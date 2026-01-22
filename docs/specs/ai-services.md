@@ -15,8 +15,10 @@ AIは回答を生成せず、以下の機能のみを担う：
 ### MVP段階
 
 - **モック実装**：固定応答またはシンプルなルールベース
+- **Gemini Flash**：コスト効率の良い本番実装（推奨）
 - **切り替え可能**：環境変数 `AI_PROVIDER` で切り替え
-  - `mock`: モック実装
+  - `mock`: モック実装（開発・テスト用）
+  - `gemini`: Google Gemini Flash（推奨・低コスト）
   - `openai`: OpenAI API
   - `claude`: Claude API
 
@@ -273,8 +275,16 @@ function mockModerate(input: ModerationInput): ModerationResult {
 ## 環境変数
 
 ```
-AI_PROVIDER=mock  # mock / openai / claude
+AI_PROVIDER=gemini  # mock / gemini / openai / claude
+
+# Google Gemini（推奨）
+GOOGLE_AI_API_KEY=AIza...
+GOOGLE_AI_MODEL=gemini-2.0-flash
+
+# OpenAI（オプション）
 OPENAI_API_KEY=sk-...
+
+# Anthropic Claude（オプション）
 ANTHROPIC_API_KEY=sk-ant-...
 ```
 

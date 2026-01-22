@@ -5,8 +5,9 @@
 
 import type { AIService } from './types';
 import { MockAIService } from './mock';
+import { GeminiAIService } from './gemini';
 
-export type AIProvider = 'mock' | 'openai' | 'claude';
+export type AIProvider = 'mock' | 'gemini' | 'openai' | 'claude';
 
 /**
  * AIサービスのインスタンスを作成する
@@ -18,6 +19,13 @@ export function createAIService(provider?: AIProvider): AIService {
   switch (selectedProvider) {
     case 'mock':
       return new MockAIService();
+    case 'gemini':
+      try {
+        return new GeminiAIService();
+      } catch (error) {
+        console.warn('Gemini initialization failed, falling back to mock:', error);
+        return new MockAIService();
+      }
     case 'openai':
       // TODO: OpenAI実装
       console.warn('OpenAI provider not implemented, falling back to mock');
